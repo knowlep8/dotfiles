@@ -1,0 +1,6 @@
+Installation
+
+	git clone git@github.com:knowlep8/dotfiles.git
+
+	cd dotfiles
+  ln -s ~/dotfiles/vimrc ~/.vimrc
