@@ -1,5 +1,10 @@
-if [ -n "$MODULEPATH" ]; then
-  module purge
+domain=${HOST#*.}
+
+if [[ $domain == "arm.com" ]]
+then
+  if [ -n "$MODULEPATH" ]; then
+    module purge
+  fi
+  export MODULEPATH=
+  module source /arm/tools/setup/init/modules-lite
 fi
-export MODULEPATH=
-module source /arm/tools/setup/init/modules-lite

@@ -1,6 +1,6 @@
 # General aliases
 
-alias ls="ls --color=tty"
+alias ls="ls -G"
 alias ll="ls -l"
 #alias rgrep="grep -r"
 alias cd..="cd .."

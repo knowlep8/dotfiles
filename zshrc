@@ -1,8 +1,12 @@
 function _zshrc_progress {
-  $HOME/bin/isatty && echo -n "\r[Kzsh initilaising... [1m$1[0m"
+  if [ -t 1 ]; then
+    echo -n "\r[Kzsh initilaising... [1m$1[0m"
+  fi
 }
 function _zshrc_progress_clear {
-  $HOME/bin/isatty && echo -n "\r[K"
+  if [ -t 1 ]; then
+    echo -n "\r[K"
+  fi
 }
 
 # Load functions
