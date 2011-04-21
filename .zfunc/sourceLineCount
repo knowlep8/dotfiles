@@ -1,1 +1,1 @@
-(for i in `rcd`/**/*.{h,cpp}; git blame $i) | awk '{print $2}' | sed -e 's/(//' -e 's/Adam/adamcn01/' | lc
+(for i in `rcd`/**/*.{h,cpp}; git blame $i) | awk '{print $2}' | sed -e 's/(//' -e 's/Paul/paukno01/' | lc

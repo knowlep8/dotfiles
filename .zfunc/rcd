@@ -2,11 +2,7 @@ local prefix="${1-.}"
 local dest="$2"
 
 local world_dir
-if [[ "$HOST" == "peanut.transitives.com" ]]; then
-  world_dir="/export/worlds"
-else
-  world_dir="/export/adam/worlds"
-fi
+world_dir="/work"
 
 if [[ ! -d "$prefix" ]]; then
   # Prefix name is not actually a prefix name

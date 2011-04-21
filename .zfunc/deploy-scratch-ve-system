@@ -2,7 +2,7 @@ base_dir=`rcd`
 ve_model_dir=$base_dir/Platforms/LISA/RTSM_VE/Build_AEMv8A/Linux-Debug-GCC-4.1
 tmp_dir=$(mktemp -d -t $mktemp_flags work.XXXXXX) || return 1
 archive_name=RTSM_VE_AEMv8A
-dest_file=/arm/scratch/adamcn01/$archive_name.tgz
+dest_file=/arm/scratch/paukno01/$archive_name.tgz
 
 echo "Copying files..." >&2
 mkdir $tmp_dir/$archive_name
