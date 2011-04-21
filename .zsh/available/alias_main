@@ -1,6 +1,12 @@
 # General aliases
+SHORT_OSTYPE=${OSTYPE/[0-9-]*/}
 
-alias ls="ls -G"
+if [[ $SHORT_OSTYPE == "darwin" ]]; then
+  alias ls="ls -G"
+else
+  alias ls="ls --color=tty"
+fi
+
 alias ll="ls -l"
 #alias rgrep="grep -r"
 alias cd..="cd .."
