@@ -1,16 +1,15 @@
 Installation
 
-  cd ~
+	cd ~
 	git clone git@github.com:knowlep8/dotfiles.git
 
 	cd dotfiles
-  git submodule init
-  git submodule update
+	git submodule init
+	git submodule update
 
-  ln -s ~/dotfiles/vimrc ~/.vimrc
-  ln -s ~/dotfiles/.vim ~/.vim
-  ln -s ~/dotfiles/zshrc ~/.zshrc
-  ln -s ~/dotfiles/.zsh ~/.zsh
-  ln -s ~/dotfiles/.zfunc ~/.zfunc
-
+	ln -s ~/dotfiles/vimrc ~/.vimrc
+	ln -s ~/dotfiles/.vim ~/.vim
+	ln -s ~/dotfiles/zshrc ~/.zshrc
+	ln -s ~/dotfiles/.zsh ~/.zsh
+	ln -s ~/dotfiles/.zfunc ~/.zfunc
 
