@@ -1,0 +1,8 @@
+cmd=$1
+shift
+
+if [ -f "/home/adam/bin/git-$cmd" ]; then
+  "/home/adam/bin/git-$cmd" $@
+else
+  command git $cmd $@
+fi

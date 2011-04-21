@@ -1,0 +1,8 @@
+clear
+date
+m $@
+while sleep 60; do
+    clear
+    date
+    m $@
+done

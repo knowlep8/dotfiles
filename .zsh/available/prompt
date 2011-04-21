@@ -1,0 +1,79 @@
+# Prompt and Menu Bar
+
+source "$HOME/.zsh/available/colours"
+
+local host=${HOST%%.*}
+
+local host_colour
+
+case $host in
+    aristotle)
+        host_colour=${fg_cyan_bold}
+        ;;
+    hobbes)
+        host_colour=${fg_magenta_bold}
+        ;;
+    lister)
+        host_colour=${fg_green_bold}
+        ;;
+    voltaire)
+        host_colour=${fg_red_bold}
+        ;;
+    *)
+        host_colour=${fg_blue_bold}
+        ;;
+esac
+
+case $TERM in
+    xterm*|rxvt)
+        TITLEBAR=$'%{\e]0;%n@%m:%~\a%}'
+        ;;
+    screen)
+        TITLEBAR=$'%{\e_screen \005 | %n@%m:%2~ \e\\%}'
+        ;;
+    *)
+        TITLEBAR=''
+        ;;
+esac
+
+if [[ ${TITLEBAR} != '' ]]; then
+    preexec () {
+        local cmd=${1[(wr)^(*=*|sudo|-*),-1]}
+        
+        echo -n "]0;$cmd"
+    }
+fi
+
+precmd() {
+    local rc=$?
+
+    if [[ $rc -ge 128 && $rc -le (127+${#signals}) ]]; then
+        psvar[1]=$signals[$rc-127]
+    else
+        psvar[1]="$rc"
+    fi
+
+    if [[ $TDIR != "" ]]; then
+        psvar[2]="_"
+    fi
+}
+
+local MONOPROMPT="%n %m%B:%b%2~ %B%?%b %(!.#.\$) "
+local COLOURPROMPT="${host_colour}%m${fg_white}:${fg_green}%2~ %(???${fg_red_bold}%1v )${fg_blue_bold}%2v%(!.#.\$) $fg_default"
+#TITLEBAR=$'%{\e]0;%n@%m:%2~\a%}'
+
+local PR
+
+case $TERM in
+    xterm*|rxvt)
+        PR=${COLOURPROMPT}
+        ;;
+    *)
+        PR=${MONOPROMPT}
+        ;;
+esac
+
+PS1="${TITLEBAR}${PR}"
+
+
+# vim: ft=zsh

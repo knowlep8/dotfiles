@@ -1,0 +1,3 @@
+warehouse_path RVCT Programs 4.1 :oban41a >/dev/null
+`warehouse_path RVCT Programs 4.1 :oban41a`/linux-pentium-dbg/$0 $*
+

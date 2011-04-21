@@ -1,0 +1,11 @@
+if [ $#argv -eq 0 ]; then
+  (cd $HOME/.zfunc && for f in *; do
+    unfunction $f
+    autoload -U $f
+  done)
+else
+  for f in $argv; do
+    unfunction $f
+    autoload -U $f
+  done
+fi

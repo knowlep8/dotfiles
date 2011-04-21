@@ -1,0 +1,60 @@
+local prefix="${1-.}"
+local dest="$2"
+
+local world_dir
+if [[ "$HOST" == "peanut.transitives.com" ]]; then
+  world_dir="/export/worlds"
+else
+  world_dir="/export/adam/worlds"
+fi
+
+if [[ ! -d "$prefix" ]]; then
+  # Prefix name is not actually a prefix name
+  if [[ ! -d "$world_dir" ]]; then
+    echo "Could not find world dir: '$world_dir'" >&2
+    return 1
+  fi
+fi
+
+function test_prefix
+{
+  dir=$1
+  abs_dir=$(cd $1 && pwd)
+  if [ -n "$abs_dir" ]; then
+    # Bypass /usr/export and /home
+    if [ "$abs_dir" = "/home" -o "$abs_dir" = "/usr/export" ]; then
+      return 1
+    fi
+
+    if [[ -d "$abs_dir/xnotes" || -d "$abs_dir/.git" ]]; then
+      print $dir
+      return 0
+    fi
+
+    # If not found, recurse up.
+    if [ "$abs_dir" != "/" ]; then
+      test_prefix "$dir/.."
+      return $?
+    fi
+  fi
+  return 1
+}
+
+good_prefix=`test_prefix $prefix`
+if [ -z $good_prefix ]; then
+  isatty && echo "Could not find base directory" >&2
+  return 1
+fi
+
+if [[ ! -d "$good_prefix/$dest" ]]; then
+  isatty && echo "Found base directory ($prefix), but could not find $dest" >&2
+  return 2
+fi
+
+if isatty; then
+  cd "$good_prefix/$dest"
+else
+  (cd "$good_prefix/$dest" && pwd)
+fi
+
+# vim: ft=zsh

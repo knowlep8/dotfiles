@@ -1,0 +1,168 @@
+local modelshell_bin
+local modelshell_dir
+local wrap_with_less
+local wrap_with_gdb
+
+# Process arguments.
+modelshell_args=()
+flag_day=
+model_type=
+next_is_c_arg=
+next_is_model_arg=
+next_is_application_arg=
+model=
+is_64bit=
+application=()
+for arg in $@; do
+  if [ "$next_is_c_arg" ]; then
+    modelshell_args=($modelshell_args -C $arg)
+    next_is_c_arg=
+  elif [ "$next_is_model_arg" ]; then
+    modelshell_args=($modelshell_args -m $arg)
+    model=$arg
+  elif [ "$next_is_application_arg" ]; then
+    application=($application $arg)
+  elif [ "${arg#--trace=}" != "$arg" ]; then
+    trace_plugin=${arg#--trace=}
+    modelshell_args=($modelshell_args --trace-plugin $trace_plugin)
+    wrap_with_less=1
+  elif [ "$arg" = '-C' ]; then
+    next_is_c_arg=1
+  elif [ "$arg" = '-m' ]; then
+    next_is_model_arg=1
+  elif [ "$arg" = '-a' ]; then
+    next_is_application_arg=1
+  elif [ "$arg" = "-d" ]; then
+    wrap_with_gdb=1
+  elif [ "$arg" = "--flag" -o "$arg" = "-f" ]; then
+    flag_day=1
+  elif [ "$arg" = "--64" ]; then
+    is_64bit=1
+  elif [ "${arg:e}" = "axf" -o "${arg:e}" = "AXF" -o "${arg:e}" = "elf" -o "${arg:e}" = "ELF" ]; then
+    application=($application $arg)
+  elif [ "${arg%.so}" != "$arg" ]; then
+    modelshell_args=($modelshell_args -m $arg)
+    model=$arg
+  elif [ "$arg" = "v8eb" ]; then
+    root_dir=`rcd`
+    model=$root_dir/Platforms/LISA/RTSM_EB/Build_ARMAEMv8A/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+    modelshell_args=($modelshell_args -m $model)
+  elif [ "$arg" = "v8ve" ]; then
+    root_dir=`rcd`
+    model=$root_dir/Platforms/LISA/RTSM_VE/Build_AEMv8A/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+    modelshell_args=($modelshell_args -m $model)
+  elif [ "$arg" = "v8val" ]; then
+    root_dir=`rcd`
+    model=$root_dir/Platforms/LISA/Validation/Build_ARMAEMv8AMP/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+    modelshell_args=($modelshell_args -m $model)
+  elif [ "${arg#EB/}" != "$arg" ]; then
+    root_dir=`rcd`
+    model=$root_dir/Platforms/LISA/RTSM_EB/Build_${arg#EB/}/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+    modelshell_args=($modelshell_args -m $model)
+  elif [ "${arg#VE/}" != "$arg" ]; then
+    root_dir=`rcd`
+    model=$root_dir/Platforms/LISA/RTSM_VE/Build_${arg#VE/}/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+    modelshell_args=($modelshell_args -m $model)
+  elif [ "${arg#Validation/}" != "$arg" ]; then
+    root_dir=`rcd`
+    model=$root_dir/Platforms/LISA/Validation/Build_${arg#Validation/}/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+    modelshell_args=($modelshell_args -m $model)
+  elif [ -z "${arg:#*=*}" ]; then
+    modelshell_args=($modelshell_args -C $arg)
+  elif [ "$arg" = "a8" ]; then
+    modelshell_args=($modelshell_args -C cpu.DBGPID=0x8000bbc08)
+  elif [ "$arg" = "a9" ]; then
+    modelshell_args=($modelshell_args -C cpu.DBGPID=0x8000bbc09)
+  elif [ "$arg" = "dap" ]; then
+    modelshell_args=($modelshell_args -C dap.dap_library_path=/work/repo/work/vstream/v-ice_xtor-dp/cpp_vlog_model/test_xtor_fastsim/build/libtestxtorfastsim.so.0.1)
+  elif [ "$arg" = "-t" -o "$arg" = "--trace" ]; then
+    warehouse_path ESL MTI_Tools 0.0 :trunk >/dev/null
+    trace_plugin=`warehouse_path ESL MTI_Tools 0.0 :trunk`/internal/plugins/Linux_GCC-3.4/TarmacTraceInternal.so
+    modelshell_args=($modelshell_args --trace-plugin $trace_plugin)
+    wrap_with_less=1
+  elif [ "$arg" = "--generic-trace" ]; then
+    warehouse_path ESL MTI_Tools 0.0 :trunk >/dev/null
+    trace_plugin=`warehouse_path ESL MTI_Tools 0.0 :trunk`/internal/plugins/Linux_GCC-3.4/GenericTrace.so
+    modelshell_args=($modelshell_args --trace-plugin $trace_plugin -C 'TRACE.GenericTrace.trace-sources=INST,CORE_REGS,CORE_REGS64,CPSR,MMU*,MODE_CHANGE,SYSREG*,CP15*,EXCEPTION*,VFP*,CC*,CPSR')
+    wrap_with_less=1
+  else
+    # Unknown; just copy through.
+    modelshell_args=($modelshell_args $arg)
+  fi
+done
+
+if [ "$model" ]; then
+  if [ -z "${model:#*Validation*}" ]; then
+    model_type=validation
+  elif [ -z "${model:#*RTSM_VE*}" ]; then
+    model_type=ve
+  elif [ -z "${model:#*RTSM_EB*}" ]; then
+    model_type=eb
+  else
+    model_type=unknown
+  fi
+fi
+
+if [ "$application" -a -z "${application:#*linux-system*.axf}" ]; then
+  if [ "$model_type" = "eb" ]; then
+    modelshell_args=($modelshell_args -C baseboard.sdram_size=0x20000000)
+  fi
+fi
+
+if [ "$flag_day" ]; then
+  if [ "$model_type" = "validation" ]; then
+    modelshell_args=($modelshell_args -C cpu.flag_day2=1)
+  elif [ "$model_type" = "ve" ]; then
+    modelshell_args=($modelshell_args -C cluster.flag_day2=1)
+  else
+    modelshell_args=($modelshell_args -C coretile.core.flag_day2=1)
+  fi
+fi
+
+if [ "$is_64bit" ]; then
+  if [ "$model_type" = "validation" ]; then
+    modelshell_args=($modelshell_args -C cpu.enable_64bit_VA=1)
+  elif [ "$model_type" = "eb" ]; then
+    modelshell_args=($modelshell_args -C coretile.core.enable_64bit_VA=1)
+  elif [ "$model_type" = "ve" ]; then
+    modelshell_args=($modelshell_args -C cluster.enable_64bit_VA=1)
+  fi
+fi
+
+for a in $application; do
+  if [ "$model_type" = "validation" ]; then
+    modelshell_args=($modelshell_args -a cpu.cpu0=$a)
+  elif [ "$model_type" = "ve" ]; then
+    modelshell_args=($modelshell_args -a cluster.cpu0=$a)
+  else
+    modelshell_args=($modelshell_args -a $a)
+  fi
+done
+
+if [ "$0" = "model_shell" ]; then
+  warehouse_path ESL ModelShell >/dev/null
+  modelshell_dir=$(warehouse_path ESL ModelShell)/Linux
+  modelshell_bin=$modelshell_dir/bin/model_shell
+elif [ "$0" = "model_debugger" ]; then
+  warehouse_path ESL ModelDebugger >/dev/null
+  modelshell_dir=$(warehouse_path ESL ModelDebugger)/Linux
+  modelshell_bin=$modelshell_dir/bin/modeldebugger.exec
+else
+  echo "Unknown command '$0'." >&2
+  return 1
+fi
+
+if [ "$wrap_with_less" ]; then
+  isatty || wrap_with_less=
+fi
+
+echo $modelshell_bin $modelshell_args
+if [ "$wrap_with_gdb" ]; then
+  gdb --args $modelshell_bin $modelshell_args
+elif [ "$wrap_with_less" ]; then
+  $modelshell_bin $modelshell_args 2>&1 | less
+else
+  $modelshell_bin $modelshell_args
+fi
+
+# vim: ft=zsh

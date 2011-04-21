@@ -1,0 +1,40 @@
+local GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=35:ln=32:bn=32:se="
+
+typeset -a grep_args
+typeset -a split_cmd
+grep_args=(-r -n -H $@)
+split_cmd=(perl -pe '@a = split /:/, $_, 3; if (@a == 3) { $_ = "$a[0]:$a[1] : $a[2]"; }')
+
+if [ $SHORT_OSTYPE != "aix" ]; then
+  grep_args=(--color=always $grep_args)
+fi
+
+real_args=0
+for arg in $argv; do
+    if [ -n "${arg:#-*}" ]; then
+        real_args=$(($real_args + 1))
+    fi
+done
+
+if [[ $real_args == 1 ]] && isatty; then
+  #location=`scd`
+  location=
+  if [ -z "$location" ]; then
+    location=.
+  fi
+  location=`relativePath $location`
+  echo "No path specified.  Assuming that you meant 'rgrep $@ $location'." >&2
+  if [ -d "$location/.svn" ]; then
+    echo "Skipping .svn directories."
+    GREP_COLORS=$GREP_COLORS find $location -wholename '*/.svn' -prune -o -type f -exec grep -H $grep_args '{}' \;| $split_cmd
+  elif [ -d "$location/.git" ]; then
+    echo "Skipping .git directory."
+    GREP_COLORS=$GREP_COLORS find $location -wholename '*/.git' -prune -o -type f -exec grep -H $grep_args '{}' \;| $split_cmd
+  else
+    GREP_COLORS=$GREP_COLORS grep $grep_args "$location" | $split_cmd
+  fi
+else
+  GREP_COLORS=$GREP_COLORS grep $grep_args | $split_cmd
+fi
+
+# vim: ft=zsh

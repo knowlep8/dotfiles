@@ -1,0 +1,17 @@
+function add_path () {
+  local new_path="$1"
+  #echo "Checking path $new_path"
+  if test -d "$new_path"; then
+    export PATH="$new_path:$PATH"
+  fi
+  #echo $path
+}
+
+
+add_path "/usr/games"
+add_path "$HOME/bin"
+add_path "$HOME/Applications/bin"
+add_path "/arm/devsys-tools/abs/"
+
+
+export PKG_CONFIG_PATH=$HOME/Applications/lib/pkgconfig

@@ -1,0 +1,10 @@
+warehouse_path RVCT Programs 4.1 :oban41a >/dev/null
+fromelf_path=`warehouse_path RVCT Programs 4.1 :oban41a`/linux-pentium-dbg/
+fromelf_which=`which $0`
+if [ -d "$fromelf_path" ]; then
+  echo $fromelf_path
+  $fromelf_path/$0 $*
+else
+  echo $fromelf_which 
+  $fromelf_which $*
+fi

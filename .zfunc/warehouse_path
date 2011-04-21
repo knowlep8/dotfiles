@@ -1,0 +1,32 @@
+local category=$1
+local name=$2
+local version=${3-0.0}
+local tag=${4-validated}
+
+# Check every hour.
+local timeout=3600
+
+local env_name=wp_${category}_${name}_${version//./_}_${tag//[^A-Za-z0-9]/}
+local env_timestamp=wp_${category}_${name}_${version//./_}_${tag//[^A-Za-z0-9]/}_ts
+local env_name_d="local curr_env_name=\$$env_name"
+local env_timestamp_d="local curr_env_timestamp=\$$env_timestamp"
+eval $env_name_d
+eval $env_timestamp_d
+
+local now=`date +%s`
+
+if [ -n "$curr_env_name" ]; then
+  if [ "$curr_env_timestamp" -gt "$(($now - $timeout))" ]; then
+    echo $curr_env_name
+    return 0
+  fi
+fi
+
+echo -n "Determining $name version..." >&2
+local rev=`/arm/devsys-tools/abs/qrt $category $name $version $tag`
+echo -n "\r[2K" >&2
+local wp_base=`/arm/devsys-tools/abs/read_build_global tool_warehouse | cut -d , -f 1 | cut -d \' -f 2`
+local wp=$wp_base/$category/$name/$version/$rev
+eval export $env_name=$wp
+eval export $env_timestamp=$now
+echo $wp

@@ -1,0 +1,28 @@
+local root_dir=`rcd`
+local test_root_dir="$root_dir/RegTests/Cores/Oban"
+if [ -z "$test_root_dir" -o \! -d "$test_root_dir" ]; then
+  echo "[31;1mERROR[0m: Cannot find fastsim root directory." >&2
+  return 1
+fi
+typeset -A tests_in_atest
+typeset -A interwork_tests_in_atest
+for t in `perl -ne '/^\s*tests\s*\+=,\s*"(.*)"\s*;\s*$/ && print "$1\n";' $test_root_dir/directory_defaults.atest`; do
+  tests_in_atest[$t]=1
+done
+for t in `perl -ne '/^\s*tests_interwork\s*\+=,\s*"(.*)"\s*;\s*$/ && print "$1\n";' $test_root_dir/directory_defaults.atest`; do
+  interwork_tests_in_atest[$t]=1
+done
+for t in $test_root_dir/tests/*/; do
+  test_name=`basename $t`
+  if [ -f "$t/$test_name.32.ss" ]; then
+    if [ -z $interwork_tests_in_atest[$test_name] ]; then
+      if [ -z $tests_in_atest[$test_name] ]; then
+        echo "[31;1mWARNING[0m: [1m$test_name[0m (interwork) present but not known by atest." >&2
+      else
+        echo "[31;1mWARNING[0m: [1m$test_name[0m (interwork) present but known by atest as a non-interwork test." >&2
+      fi
+    fi
+  elif [ -f "$t/$test_name.ss" -a -z $tests_in_atest[$test_name] ]; then
+    echo "[31;1mWARNING[0m: [1m$test_name[0m present but not known by atest." >&2
+  fi
+done

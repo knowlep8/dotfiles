@@ -1,0 +1,27 @@
+# Create a temporary directory and run a shell in it
+
+local opt
+local mktemp_flags
+
+while getopts d: opt; do
+    case $opt in
+      d)
+        mktemp_flags="-p $OPTARG"
+        ;;
+
+    esac
+done
+
+(
+  TDIR=$(mktemp -d -t $mktemp_flags work.XXXXXX) || return 1
+  export TDIR
+  cd "$TDIR" || return 1
+  rm -f /tmp/work-latest
+  ln -s `basename "$TDIR"` /tmp/work-latest
+  zsh && {
+    rm -rf "$TDIR" && if [ 'z'`readlink /tmp/work-latest` = 'z'`basename "$TDIR"` ]; then
+      rm /tmp/work-latest
+    fi
+  }
+)
+    

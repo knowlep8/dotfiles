@@ -1,0 +1,5 @@
+if [ -n "$MODULEPATH" ]; then
+  module purge
+fi
+export MODULEPATH=
+module source /arm/tools/setup/init/modules-lite

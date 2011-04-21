@@ -1,0 +1,10 @@
+# General aliases
+
+alias ls="ls --color=tty"
+alias ll="ls -l"
+#alias rgrep="grep -r"
+alias cd..="cd .."
+
+if [ -n "$DISPLAY" ]; then
+    alias ssh="ssh -X"
+fi

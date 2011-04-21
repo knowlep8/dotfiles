@@ -1,0 +1,51 @@
+if [ -z "$1" ]; then
+  echo "usage: $0 <model spec>" >&2
+  return 1
+fi
+
+model_spec="$1"
+root_dir=`rcd`
+
+if [ -f "$root_dir/$model_spec" -a "${model_spec%.so}" != "$model_spec" ]; then
+  $model_spec="$root_dir/$model_spec"
+fi
+
+if [ -f "$model_spec" -a "${model_spec%.so}" != "$model_spec" ]; then
+  # Specified location is a file.
+  if [ "${model_spec#/}" != "$model_spec" ]; then
+    # Absolute path.
+    echo $model_spec
+  else
+    # Relative path; make absolute.
+    echo "$PWD/$model_spec"
+  fi
+
+elif [ "$model_spec" = "v8ve" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_VE/Build_ARMAEMv8A/Linux-Debug-GCC_4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "v8eb" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_EB/Build_AEMv8A/Linux-Debug-GCC_4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "v8val" ]; then
+  echo "$root_dir/Platforms/LISA/Validation/Build_ARMAEMv8AMP/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+
+elif [ "$model_spec" = "v7ve" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_VE/Build_ARMAEMv8A/Linux-Debug-GCC_4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "v7eb" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_EB/Build_AEMv8A/Linux-Debug-GCC_4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "v7val" ]; then
+  echo "$root_dir/Platforms/LISA/Validation/Build_ARMAEMv8AMP/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+
+elif [ "$model_spec" = "a15ve" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_VE/Build_Cortex-A15x1/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "a15eb" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_EB/Build_Cortex-A15x1/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "a15val" ]; then
+  echo "$root_dir/Platforms/LISA/Validation/Build_CortexA15/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+
+elif [ "$model_spec" = "a9ve" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_VE/Build_Cortex-A9/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "a9eb" ]; then
+  echo "$root_dir/Platforms/LISA/RTSM_EB/Build_Cortex-A9/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+elif [ "$model_spec" = "a9val" ]; then
+  echo "$root_dir/Platforms/LISA/Validation/Build_CortexA9/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so"
+  
+fi

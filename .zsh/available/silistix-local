@@ -1,0 +1,8 @@
+export SILISTIX_HOME="$HOME/install"
+#export SILISTIX_HOME="/common/linux/appl/handloom"
+
+#source "$SILISTIX_HOME/handloom.sh"
+
+export PATH=$HOME/bin:${PATH}:/common/linux/bin
+
+export ACLOCAL_FLAGS="${ACLOCAL_FLAGS} -I /common/linux/etc/aclocal -I /common/linux/appl/cppunit/share/aclocal"

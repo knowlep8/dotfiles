@@ -1,0 +1,26 @@
+local module_root
+local module_setup
+local module_platform
+local module_tclsh
+
+module_root=/arm/tools
+module_setup=$module_root/setup
+module_platform=`$module_setup/bin/platform depot-platform`
+if [ -x $ROOT/tct/tcl/8.5.2/$PLATFORM/bin/tclsh ]; then
+  module_tclsh=$ROOT/tct/tcl/8.5.2/$PLATFORM/bin/tclsh
+elif [ -x $ROOT/tct/tcl/8.5.0/$PLATFORM/bin/tclsh ]; then
+  module_tclsh=$ROOT/tct/tcl/8.5.0/$PLATFORM/bin/tclsh
+elif [ -x $ROOT/tct/tcl/8.4.11/$PLATFORM/bin/tclsh ]; then
+  module_tclsh=$ROOT/tct/tcl/8.4.11/$PLATFORM/bin/tclsh
+elif [ -x /usr/local/bin/tclsh ]; then
+  module_tclsh=/usr/local/bin/tclsh
+elif [ -x /usr/bin/tclsh ]; then
+  module_tclsh=/usr/bin/tclsh
+fi
+
+if [ -z "$module_tclsh" -o ! -x "$module_tclsh" ]; then
+  echo "Could not find a tclsh." >&2
+  return 1
+fi
+
+eval `MODULESHOME=$module_setup ARM_MODULE_ROOT=$module_root/modulefiles $module_tclsh $module_setup/lib/modulecmd.tcl zsh $*`

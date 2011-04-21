@@ -1,0 +1,35 @@
+# Find running sds_conn_mgr.
+local pid
+pid=`pgrep sds_conn_mgr`
+
+
+if [ -n "$pid" ]; then
+  echo -n "\rKilling sds_conn_mgr ($pid)..." >&2
+  kill $pid
+
+  local spinner
+  typeset -a spinner
+  spinner=(/ - \\ '|')
+  local spinner_curr
+  spinner_curr=1
+  local count=0
+
+  while kill -0 $pid 2>/dev/null; do
+    sleep 1
+    count=$((count + 1))
+
+    if [ $count -eq 30 ]; then
+      echo "\rERROR: Took too long to try to kill current sds_conn_mgr; giving up." >&2
+      return 1
+    fi
+
+    echo -n "\rKilling sds_conn_mgr ($pid)... $spinner[$spinner_curr]" >&2
+    spinner_curr=$((spinner_curr + 1))
+    if [ $spinner_curr -gt $#spinner ]; then
+      spinner_curr=1
+    fi
+  done
+fi
+
+echo "\r\e[2KStarting new sds_conn_mgr..."
+(cd /work/repo/work/vstream && LD_LIBRARY_PATH=/work/repo/work/vstream/v-ice_xtor-dp/bin/linux/rel/gcc-4.1.2 sim_target_api/server/bin/linux/rel/gcc-4.1.2/sds_conn_mgr && sleep 1)

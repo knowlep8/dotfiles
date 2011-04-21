@@ -1,0 +1,40 @@
+local root_dir
+local test_root
+local atest_script
+local model
+local cmd
+local extra_args
+local tests
+
+warehouse_path ESL ATest 1.0 :trunk >/dev/null
+atest_script=`warehouse_path ESL ATest 1.0 :trunk`/scripts/atest
+root_dir=`rcd`
+test_root=$root_dir/RegTests
+model=$root_dir/Platforms/LISA/Validation/Build_ARMAEMv8AMP/Linux-Debug-GCC-4.1/cadi_system_Linux-Debug-GCC-4.1.so
+typeset -a extra_args
+typeset -a tests
+
+for arg in $@; do
+  if [ $arg[1] = "-" ]; then
+    # Switch => pass straight through to atest.
+    extra_args=($extra_args $arg)
+  else
+    # Assume it is a test name.
+    tests=($tests "Cores/Oban/run*:all_tests@$arg")
+  fi
+done
+
+cmd=($atest_script $test_root -G model=$model $extra_args)
+
+if [ -z $tests[1] ]; then
+  tests=("Cores/Oban/run*")
+fi
+
+for t in $tests; do
+  cmd=($cmd -t $t)
+done
+
+echo $cmd
+$cmd
+
+# vim: ft=zsh sts=2 sw=2

@@ -1,0 +1,54 @@
+root_dir=`rcd`
+if [ -z "$root_dir" ]; then
+  echo "Cannot find fastsim root directory." >&2
+  return 1
+fi
+
+if [ -z "$1" ]; then
+  echo "usage: $0 <job_name> ..." >&2
+  return 2
+fi
+
+shared_manx_dir=/arm/scratch/paukno01/manx
+shared_scripts_dir=$shared_manx_dir/scripts
+shared_model_dir=$shared_manx_dir/model
+val_world=/arm/scratch/paukno01/eagleValWorld
+model_path=$root_dir/Platforms/LISA/Validation/Build_CortexA15/Linux-Debug-GCC-4.1
+results_csv=results.csv
+lsf_width=50
+mxditest_src_path=$root_dir/build/PVModelLib/internal/bin/Linux_GCC-4.1/mxditest
+mxditest_path=$shared_manx_dir/mxditest
+project=pr356
+
+typeset -a jobs_args
+for a in $@; do
+  job_file="$val_world/jobs_exec/$a.job"
+  jobs_args=($jobs_args ${~job_file})
+done
+
+if [ ! -d "$shared_manx_dir" ]; then
+  echo "Creating directory $shared_manx_dir..." >&2
+  mkdir -p "$shared_manx_dir" || return $?
+fi
+if [ ! -d "$shared_scripts_dir" ]; then
+  echo "Creating directory $shared_scripts_dir..." >&2
+  mkdir -p "$shared_scripts_dir" || return $?
+fi
+if [ ! -d "$shared_model_dir" ]; then
+  echo "Creating directory $shared_model_dir..." >&2
+  mkdir -p "$shared_model_dir" || return $?
+fi
+
+echo "Updating shared scripts in $shared_scripts_dir..." >&2
+rsync -a --delete "$root_dir/Scripts" $shared_scripts_dir || return $?
+
+echo "Updating model in $shared_model_dir..." >&2
+rsync -a --delete $model_path/* $shared_model_dir || return $?
+model_path=$shared_model_dir
+
+echo "Copying mkditest to shared storage..." >&2
+cp $mxditest_src_path $mxditest_path || return $?
+
+echo "Running manx..." >&2
+LSB_DEFAULTPROJECT=$project /arm/tools/setup/bin/mrun +arm/cluster $shared_scripts_dir/Scripts/validation/manxwrap.py --valworld=$val_world --lsf-jobs=$lsf_width --csv-output=$shared_manx_dir/$results_csv --model=$model_path/cadi_system_Linux-Debug-GCC-4.1.so --use-shared-storage --tool $mxditest_path $jobs_args
+return $?

@@ -1,0 +1,25 @@
+host=${HOST%%.*}
+domain=${HOST#*.}
+
+if [[ $domain == "meliorist.co.uk" ]]
+then
+    alias a="ssh aristotle"
+    alias h="ssh hobbes"
+    alias l="ssh lister"
+    alias v="ssh mythtv@voltaire"
+    alias z="ssh zulu"
+else
+    alias a="ssh adam@meliorist.co.uk"
+fi
+
+if [[ $host != "cixous" ]]; then
+    alias m="ssh -t meliorist.co.uk /home/adam/bin/mailexec scan"
+fi
+
+case $host in
+    flamel|aristotle)
+        alias waldo="ssh mugss@umu.man.ac.uk"
+        ;;
+esac
+
+alias moo="ssh adam@moo.cus.org.uk"
