@@ -16,6 +16,7 @@ val_world=/arm/projectscratch/pd/validation/paukno01/eagleValWorld
 model_path=$root_dir/Platforms/LISA/Validation/Build_CortexA15/Linux-Debug-GCC-4.1
 results_csv=results.csv
 lsf_width=50
+lsf_queue=low
 mxditest_src_path=$root_dir/build/PVModelLib/internal/bin/Linux_GCC-4.1/mxditest
 mxditest_path=$shared_manx_dir/mxditest
 project=pr356
@@ -50,5 +51,5 @@ echo "Copying mkditest to shared storage..." >&2
 cp $mxditest_src_path $mxditest_path || return $?
 
 echo "Running manx..." >&2
-LSB_DEFAULTPROJECT=$project /arm/tools/setup/bin/mrun +arm/cluster $shared_scripts_dir/Scripts/validation/manxwrap.py --valworld=$val_world --lsf-jobs=$lsf_width --csv-output=$shared_manx_dir/$results_csv --model=$model_path/cadi_system_Linux-Debug-GCC-4.1.so --use-shared-storage --tool $mxditest_path $jobs_args
+LSB_DEFAULTPROJECT=$project /arm/tools/setup/bin/mrun +arm/cluster $shared_scripts_dir/Scripts/validation/manxwrap.py --valworld=$val_world --lsf-jobs=$lsf_width --lsf-queue=$lsf_queue --csv-output=$shared_manx_dir/$results_csv --model=$model_path/cadi_system_Linux-Debug-GCC-4.1.so --use-shared-storage --tool $mxditest_path $jobs_args
 return $?
