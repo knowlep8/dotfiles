@@ -22,9 +22,9 @@ call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 
 :syntax on
-:set shiftwidth=2
-:set softtabstop=2
-:set tabstop=2
+:set shiftwidth=4
+:set softtabstop=4
+:set tabstop=8
 :set smartindent
 :set statusline=%1*%F%*\ %y\ %2*%r%m%*\ %=%l/%L\ (%p%%)
 :set laststatus=2
