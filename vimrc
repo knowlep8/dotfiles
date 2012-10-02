@@ -32,4 +32,6 @@ call pathogen#helptags()
 :set expandtab
 :set tags=./tags,./../tags,./*/tags
 
+autocmd BufNewFile,BufRead *.json set ft=javascript
+
 filetype plugin on
