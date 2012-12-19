@@ -21,6 +21,8 @@ endif
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 
+set rtp+=/usr/local/go/misc/vim
+
 :syntax on
 :set shiftwidth=4
 :set softtabstop=4
@@ -32,6 +34,7 @@ call pathogen#helptags()
 :set expandtab
 :set tags=./tags,./../tags,./*/tags
 
+filetype plugin indent on
+
 autocmd BufNewFile,BufRead *.json set ft=javascript
 
-filetype plugin on
