@@ -1,0 +1,45 @@
+# setup the original session and name the first screen AtlasModelBuild
+screen -d -m -S workScreenSession -t AtlasModelBuild
+
+# configure the AtlasModelBuild session
+screen -X -S workScreenSession -p 0 stuff "zsh
+"
+screen -X -S workScreenSession -p 0 stuff "cd /work/newAtlasCT/trunk/work/fastsim; export PVLIB_HOME=/work/newAtlasCT/trunk/work/fastsim/build/PVModelLib/internal
+"
+local rev=`/arm/devsys-tools/abs/qrt ESL SystemGenerator 0.0 :trunk`
+local wp_base=`/arm/devsys-tools/abs/read_build_global tool_warehouse | cut -d , -f 1 | cut -d \' -f 2`
+local wp=$wp_base/ESL/SystemGenerator/0.0/$rev/Linux
+screen -X -S workScreenSession -p 0 stuff "export MAXCORE_HOME=$wp
+" 
+screen -X -S workScreenSession -p 0 stuff "export PATH=\$PATH:\$MAXCORE_HOME/bin
+"
+
+#configure the AtlasModelSource session
+screen -X -S workScreenSession screen -t AtlasModelSrc 1
+screen -X -S workScreenSession -p 1 stuff "zsh
+"
+screen -X -S workScreenSession -p 1 stuff "cd /work/newAtlasCT/trunk/work/fastsim; export PVLIB_HOME=/work/newAtlasCT/trunk/work/fastsim/build/PVModelLib/internal
+"
+local rev=`/arm/devsys-tools/abs/qrt ESL SystemGenerator 0.0 :trunk`
+local wp_base=`/arm/devsys-tools/abs/read_build_global tool_warehouse | cut -d , -f 1 | cut -d \' -f 2`
+local wp=$wp_base/ESL/SystemGenerator/0.0/$rev/Linux
+screen -X -S workScreenSession -p 1 stuff "export MAXCORE_HOME=$wp
+" 
+screen -X -S workScreenSession -p 1 stuff "export PATH=\$PATH:\$MAXCORE_HOME/bin
+"
+screen -X -S workScreenSession -p 1 stuff "gen-cscope
+"
+
+#configure the AtlasCopyLibs session
+screen -X -S workScreenSession screen -t AtlasCopyLibs 2
+screen -X -S workScreenSession -p 2 stuff "zsh
+"
+screen -X -S workScreenSession -p 2 stuff "cd /arm/scratch/paukno01/atlas/logical/testbench/shared/isscompare/atlas_ct/lib
+"
+
+#configure the AtlasWrapper session
+screen -X -S workScreenSession screen -t AtlasWrapper 3
+screen -X -S workScreenSession -p 3 stuff "zsh
+"
+screen -X -S workScreenSession -p 3 stuff "cd /work/ct_wrapper
+"
