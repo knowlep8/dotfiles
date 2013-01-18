@@ -1,9 +1,0 @@
-local module_root
-local module_setup
-local module_platform
-
-module_root=/arm/tools
-module_setup=$module_root/setup
-
-$module_setup/bin/mgrep $*
-return $?

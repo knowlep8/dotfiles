@@ -1,1 +1,0 @@
-(nm dynamite | grep '^[a-fA-F0-9][a-fA-F0-9]* [TBW] ' | grep --colour=auto $1)

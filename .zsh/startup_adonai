@@ -1,8 +1,0 @@
-# Display new mail information
-m
-
-# Display a fortune
-echo
-fortune
-echo
-

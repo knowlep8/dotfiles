@@ -1,6 +1,2 @@
 domain=${HOST#*.}
 
-if [[ $domain == "meliorist.co.uk" ]]
-then
-    export http_proxy=http://proxy.meliorist.co.uk:3128/
-fi
