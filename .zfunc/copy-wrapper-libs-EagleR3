@@ -1,0 +1,13 @@
+root_dir=`rcd`
+if [ -z "$root_dir" ]; then
+  echo "Cannot find fastsim root directory." >&2
+  return 1
+fi
+
+eagle_iss_dir=/projects/pd/validation/paukno01/eaglePWRSandbox/logical/testbench/shared/isscompare/top/lib
+model_dir=$root_dir/Platforms/LISA/Validation/Build_CortexA15/Linux-Release-GCC-4.1
+
+cp $model_dir/cadi_system_Linux-Release-GCC-4.1.so $eagle_iss_dir/cadi_system_Linux-Release-GCC-3.4.so
+cp $model_dir/libarmctmodel.so $eagle_iss_dir/libarmctmodel.so
+cp $model_dir/libMAXCOREInitSimulationEngine.so.2 $eagle_iss_dir/libMAXCOREInitSimulationEngine.so.2
+

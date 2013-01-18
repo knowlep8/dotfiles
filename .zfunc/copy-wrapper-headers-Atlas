@@ -1,0 +1,14 @@
+root_dir=`rcd`
+if [ -z "$root_dir" ]; then
+  echo "Cannot find fastsim root directory." >&2
+  return 1
+fi
+
+atlas_iss_dir=/projects/pd/validation/paukno01/atlas/logical/testbench/shared/isscompare/atlas_ct/include
+model_dir=$root_dir/Platforms/LISA/Validation/Build_Atlas/Linux-Debug-GCC-4.1
+ct_wrapper_dir=$root_dir/sandbox/CTWrapper/
+
+cp $ct_wrapper_dir/CallBackDataTypes.h $atlas_iss_dir/CallBackDataTypes.h
+cp $ct_wrapper_dir/Registers.h $atlas_iss_dir/Registers.h
+cp $ct_wrapper_dir/SimpleAPI.h $atlas_iss_dir/SimpleAPI.h
+cp $ct_wrapper_dir/ctmodel_wrapper.h $atlas_iss_dir/ctmodel_wrapper.h

@@ -1,0 +1,168 @@
+root_dir=`rcd`
+if [ -z "$root_dir" ]; then
+  echo "Cannot find fastsim root directory." >&2
+  return 1
+fi
+
+if [ -z "$1" ]; then
+  echo "usage: $0 <job_name> ..." >&2
+  return 2
+fi
+
+shared_manx_dir=/arm/scratch/paukno01/manx
+
+if [ ! -d "$shared_manx_dir" ]; then
+  echo "Creating directory $shared_manx_dir..." >&2
+  mkdir -p "$shared_manx_dir" || return $?
+fi
+
+lock_index=0
+lock_file="$shared_manx_dir/lock.$lock_index"
+while [ -f $lock_file ]; do
+  echo "[1;31mWARNING:[0m $shared_manx_dir/$lock_index is locked."
+  lock_index=$((lock_index + 1))
+  lock_file="$shared_manx_dir/lock.$lock_index"
+done
+echo $$ > $lock_file
+shared_manx_dir=$shared_manx_dir/$lock_index
+shared_scripts_dir=$shared_manx_dir/scripts
+shared_model_dir=$shared_manx_dir/model
+
+val_world=/arm/validation2/fastsim/suites/Eagle_trunk_r48763/validation
+model_path=$root_dir/Platforms/LISA/Validation/Build_CortexA15/Linux-Debug-GCC-4.1
+results_csv=$shared_manx_dir/results.csv
+results_copy=results.csv
+lsf_width=200
+xditest_src_path=$root_dir/build/PVModelLib/internal/bin/Linux_GCC-4.1/mxditest
+mxditest_path=$shared_manx_dir/mxditest
+tool=$mxditest_path
+project=pr484
+release=
+timeout=
+custom_tool=
+
+typeset -a jobs_files
+typeset -a jobs_args
+next_is=
+for a in $@; do
+  if [ "$next_is" = "output" ]; then
+    results_copy=$a
+    next_is=
+  elif [ "$next_is" = "val_world" ]; then
+    val_world=$a
+    next_is=
+  elif [ "$next_is" = "timeout" ]; then
+    timeout=$a
+    next_is=
+  elif [ "$next_is" = "tool" ]; then
+    tool=$a
+    custom_tool=1
+    next_is=
+  elif [ "$a" = "-o" ]; then
+    next_is=output
+  elif [ "$a" = "--val-world" ]; then
+    next_is=val_world
+  elif [ "$a" = "--tool" ]; then
+    next_is=tool
+  elif [ "$a" = "--heron" -o "$a" = "--r5" ]; then
+    val_world=/arm/ref/sdd/fastsim/validation/Heron_trunk_r46960
+    model_path=$root_dir/Platforms/LISA/Validation/Build_CortexR5/Linux-Debug-GCC-4.1
+  elif [ "$a" = "--a5" ]; then
+    val_world=/arm/ref/sdd/fastsim/validation/Cortex-A5_r0p0_b44
+    model_path=$root_dir/Platforms/LISA/Validation/Build_SparrowUP/Linux-Debug-GCC-4.1
+  elif [ "$a" = "--a5mp" ]; then
+    val_world=/arm/ref/sdd/fastsim/validation/Cortex-A5MP_r0p0_b44
+    model_path=$root_dir/Platforms/LISA/Validation/Build_SparrowMP/Linux-Debug-GCC-4.1
+  elif [ "$a" = "--r4" ]; then
+    val_world=/arm/validation2/fastsim/suites/Skylark_trunk_r161333
+    model_path=$root_dir/Platforms/LISA/Validation/Build_SkylarkMP/Linux-Debug-GCC-4.1
+  elif [ "$a" = "--a9up" ]; then
+    val_world=/arm/ref/sdd/fastsim/validation/Cortex-A9UP_r1p0-09week02
+    model_path=$root_dir/Platforms/LISA/Validation/Build_CortexA9UP/Linux-Debug-GCC-4.1
+  elif [ "$a" = "--a9mp" ]; then
+    val_world=/arm/ref/sdd/fastsim/validation/Cortex-A9MP_r1p0-09week02
+    model_path=$root_dir/Platforms/LISA/Validation/Build_CortexA9MP/Linux-Debug-GCC-4.1
+  elif [ "$a" = "--v8" ]; then
+    val_world=/projects/pr484_carnalea/suites/latest/validation
+    model_path=$root_dir/Platforms/LISA/Validation/Build_ARMAEMv8AMP/Linux-Debug-GCC-4.1
+    tool="$shared_model_dir/isim_system"
+  elif [ "$a" = "--v7" ]; then
+    val_world=/arm/ref/sdd/fastsim/validation/AEMv7_r0p0_04rel0_tidy2
+    model_path=$root_dir/Platforms/LISA/Validation/Build_AEMv7AMP/Linux-Debug-GCC-4.1
+  elif [ "$a" = "-r" -o "$a" = "--release" ]; then
+    release=1
+  elif [ "$a" = "all" ]; then
+    jobs_files=($jobs_files "*")
+  elif [ "$a" = "-T" -o "$a" = "--timeout" ]; then
+    next_is=timeout
+  else
+    jobs_files=($jobs_files $a)
+  fi
+done
+
+if [ -n "$release" ]; then
+  model_path=${model_path/Linux-Debug/Linux-Release}
+fi
+
+for f in $jobs_files; do
+  if [ ${f#/} = $f ]; then
+    job_file="$val_world/jobs_exec/$f.job"
+  else
+    job_file=$f
+  fi
+  jobs_args=($jobs_args ${~job_file})
+done
+
+if [ ! -d "$shared_manx_dir" ]; then
+  echo "Creating directory $shared_manx_dir..." >&2
+  mkdir -p "$shared_manx_dir" || return $?
+fi
+if [ ! -d "$shared_scripts_dir" ]; then
+  echo "Creating directory $shared_scripts_dir..." >&2
+  mkdir -p "$shared_scripts_dir" || return $?
+fi
+if [ ! -d "$shared_model_dir" ]; then
+  echo "Creating directory $shared_model_dir..." >&2
+  mkdir -p "$shared_model_dir" || return $?
+fi
+
+echo "Updating shared scripts in $shared_scripts_dir..." >&2
+rsync -a --delete "$root_dir/Scripts" $shared_scripts_dir || return $?
+
+echo "Updating model ($model_path) in $shared_model_dir..." >&2
+rsync -a --delete $model_path/* $shared_model_dir || return $?
+model_path=$shared_model_dir/cadi_system_Linux-Debug-GCC-4.1.so
+if [ -n "$release" ]; then
+  model_path=$shared_model_dir/cadi_system_Linux-Release-GCC-4.1.so
+fi
+
+if [ -n "$custom_tool" ]; then
+  echo "Copying tool to $shared_model_dir..." >&2
+  cp $tool $shared_model_dir/tool
+  tool=$shared_model_dir/tool
+fi
+
+typeset -a extra_args
+extra_args=()
+if [ "$timeout" ]; then
+  extra_args=($extra_args --timeout=$timeout)
+fi
+
+echo "Copying mkditest to shared storage..." >&2
+#cp $mxditest_src_path $mxditest_path || return $?
+
+ln -sf $results_csv $results_copy
+
+echo "Running manx..." >&2
+echo LSB_DEFAULTPROJECT=$project $shared_scripts_dir/Scripts/validation/manxwrap.py --valworld=$val_world --lsf-queue=normal --lsf-jobs=$lsf_width --csv-output=$results_csv --model=$model_path --use-shared-storage --tool $tool $jobs_args $extra_args
+LSB_DEFAULTPROJECT=$project $shared_scripts_dir/Scripts/validation/manxwrap.py --valworld=$val_world --lsf-queue=normal --lsf-jobs=$lsf_width --csv-output=$results_csv --model=$model_path --use-shared-storage --tool $tool $jobs_args $extra_args
+rc=$?
+
+echo "Copying results..." >&2
+rm $results_copy
+cp $results_csv $results_copy
+
+echo "Removing lock..." >&2
+rm $lock_file
+
+return $rc

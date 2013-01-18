@@ -1,0 +1,5 @@
+cp /work/ct_wrapper/cadi_system_Linux-Release-GCC-3.4.so .
+cp /work/ct_wrapper/libMAXCOREInitSimulationEngine.so.2 .
+cp /work/ct_wrapper/libctwrapper.so .
+cp /work/ct_wrapper/libarmctmodel.so .
+
