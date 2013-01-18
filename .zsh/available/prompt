@@ -1,5 +1,9 @@
 # Prompt and Menu Bar
 
+if [ "$TERM" = "rxvt-unicode" ]; then
+  TERM=rxvt
+fi
+
 source "$HOME/.zsh/available/colours"
 
 local host=${HOST%%.*}
@@ -26,7 +30,7 @@ esac
 
 case $TERM in
     xterm*|rxvt)
-        TITLEBAR=$'%{\e]0;%n@%m:%~\a%}'
+        TITLEBAR=$'%{\e]0;%m:%~\a%}'
         ;;
     screen)
         TITLEBAR=$'%{\e_screen \005 | %n@%m:%2~ \e\\%}'
@@ -39,7 +43,13 @@ esac
 if [[ ${TITLEBAR} != '' ]]; then
     preexec () {
         local cmd=${1[(wr)^(*=*|sudo|-*),-1]}
-        
+        #cmd=${cmd//[^A- ]/ }
+        cmd=${cmd//\\/\\\\}
+        cmd=`tr '\n' ' ' <<< $cmd`
+        if [ "$cmd" = "fg " ]; then
+          cmd=$jobtexts[1]
+        fi
+
         echo -n "]0;$cmd"
     }
 fi
