@@ -13,5 +13,6 @@ Installation
 	ln -s ~/dotfiles/.zsh ~/.zsh
 	ln -s ~/dotfiles/.zfunc ~/.zfunc
         ln -s ~/dotfiles/.tmux.conf ~/.tmux.conf
-        ln -s ~/dotfiles/.vim/fly.vim ~/dotfiles/.vim/bundle/fly
+        
+        mv ~/dotfiles/.vim/fly.vim ~/dotfiles/.vim/bundle/fly
 
