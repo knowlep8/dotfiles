@@ -18,8 +18,7 @@ else
 	autocmd VimEnter * if getcwd()=="/" | if strlen(@%) | cd %:p:h | else | cd | endif | endif
 endif
 
-call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
+call pathogen#infect()
 
 set rtp+=/usr/local/go/misc/vim
 
