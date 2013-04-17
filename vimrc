@@ -1,6 +1,5 @@
-" System vimrc file for Mac OS X
-" Author:  Benji Fisher <benji@member.AMS.org>
-" Last modified:  5 April 2003
+" Sources for this came from many places
+" vimrc of Paul Knowles
 
 " Get a good value for $PATH.  For example, if teTeX is installed, this
 " should add the path to tex, pdflatex, etc.
@@ -9,29 +8,35 @@
 let $PATH = system("printenv PATH")
 let $PATH = substitute($PATH, "\<C-J>$", "", "")
 
-" If running in a Terminal window, set the terminal type to allow syntax
-" highlighting.
-" Otherwise, change directory on startup.
-if !has("gui_running")
-	set term=ansi
-else
-	autocmd VimEnter * if getcwd()=="/" | if strlen(@%) | cd %:p:h | else | cd | endif | endif
-endif
-
 call pathogen#infect()
 
 set rtp+=/usr/local/go/misc/vim
 
-:syntax on
-:set shiftwidth=4
-:set softtabstop=4
-:set tabstop=8
-:set smartindent
-:set statusline=%1*%F%*\ %y\ %2*%r%m%*\ %=%l/%L\ (%p%%)
-:set laststatus=2
-:set sm
-:set expandtab
-:set tags=./tags,./../tags,./*/tags
+if exists('+colorcolumn')
+    set colorcolumn=80
+endif
+
+syntax on
+set shiftwidth=4
+set softtabstop=4
+set tabstop=8
+set smartindent
+
+hi User1 ctermbg=black ctermfg=white   guibg=green guifg=red
+hi User2 ctermbg=black ctermfg=green   guibg=red   guifg=blue
+hi User3 ctermbg=black ctermfg=yellow  guibg=blue  guifg=green
+hi User4 ctermbg=black ctermfg=red     guibg=blue  guifg=green
+
+set statusline=
+set statusline+=%1*%F%m%r%h%w\ 
+set statusline+=%2*%{fugitive#statusline()}\    
+set statusline+=%=
+set statusline+=%3*\ [line\ %l\/%L]          
+set statusline+=%4*\ [col\ %v]
+set laststatus=2
+set sm
+set expandtab
+set tags=./tags,./../tags,./*/tags
 
 filetype plugin indent on
 
