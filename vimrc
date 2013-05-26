@@ -43,3 +43,9 @@ filetype plugin indent on
 autocmd BufNewFile,BufRead *.json set ft=javascript
 
 map ,t :FufCoverageFile<CR>
+
+nmap <leader>l :set list!<CR>
+set listchars=tab:▸\ ,eol:¬
+
+nmap <leader>A :tab split<CR>:Ack <C-r><C-w><CR>
+"
