@@ -1,6 +1,6 @@
 #! /bin/sh
 
-echo "source ~/liquidprompt/liquidprompt" >> ~/.bashrc
+echo "source ~/dotfiles/liquidprompt/liquidprompt" >> ~/.bashrc
 echo "export EDITOR=vim" >> ~/.bashrc
 
 ln -s ~/dotfiles/vimrc ~/.vimrc
