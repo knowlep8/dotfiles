@@ -11,4 +11,5 @@ Installation
 	ln -s ~/dotfiles/.zsh ~/.zsh
 	ln -s ~/dotfiles/.zfunc ~/.zfunc
         ln -s ~/dotfiles/.tmux.conf ~/.tmux.conf
+        ln -s ~/dotfiles/.liquidpromptrc ~/.liquidpromptrc
         
