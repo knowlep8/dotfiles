@@ -12,9 +12,9 @@ call pathogen#infect()
 
 set rtp+=/usr/local/go/misc/vim
 
-if exists('+colorcolumn')
-    set colorcolumn=80
-endif
+" if exists('+colorcolumn')
+"     set colorcolumn=80
+" endif
 
 syntax on
 set shiftwidth=4
