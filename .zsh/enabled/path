@@ -7,10 +7,4 @@ function add_path () {
   #echo $path
 }
 
-
-add_path "/usr/games"
 add_path "$HOME/bin"
-add_path "$HOME/Applications/bin"
-
-
-export PKG_CONFIG_PATH=$HOME/Applications/lib/pkgconfig

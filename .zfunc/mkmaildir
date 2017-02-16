@@ -1,3 +1,0 @@
-for i in $@; do
-    mkdir $i $i/{cur,new,tmp}
-done

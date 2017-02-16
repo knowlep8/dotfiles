@@ -1,6 +1,0 @@
-# Bootstrap, configure and make an automake/autoconf package
-
-(
-    ./bootstrap && ./configure && amke
-)
-    

@@ -1,5 +1,0 @@
-rm -f cscope.out
-find . -name '*.cpp' > files.lst
-find . -name '*.c' >> files.lst
-find . -name '*.h' >> files.lst
-cscope -b -k -i files.lst
