@@ -1,4 +1,0 @@
-# Import other startup files
-for i in ~/.zsh/available/startup_*; do
-    source $i
-done

@@ -1,4 +1,0 @@
-# Import other alias files
-for i in ~/.zsh/available/alias_*; do
-    source $i
-done
