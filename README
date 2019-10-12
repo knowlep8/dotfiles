@@ -5,3 +5,4 @@ Installation
 	cd dotfiles
         git submodule update --init .
 	./setup.sh
+        launch tmux and do ctrl-a I to install plugins
